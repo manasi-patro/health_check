@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'user_health_profile.dart';
 
 void main() {
   runApp(const MyApp());
@@ -92,12 +91,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   // 👉 RIGHT SIDE ARROW
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const UserHealthProfile(),
-                        ),
-                      );
+                      // Navigation to UserHealthProfile has been disabled.
+                      // If you want a different behavior, replace this with:
+                      // Navigator.pop(context);
+                      // or show a message:
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   const SnackBar(content: Text('Disabled'))
+                      // );
                     },
                     child: const Icon(Icons.arrow_forward_ios, size: 24),
                   ),

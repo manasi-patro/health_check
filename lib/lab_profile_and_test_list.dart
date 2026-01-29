@@ -39,10 +39,20 @@ class _LabProfileScreenState extends State<LabProfileScreen> {
   }
 
   Future<void> loadTests() async {
-    final data = await rootBundle.loadString('assets/lab_tests.json');
-    setState(() {
-      tests = json.decode(data);
-    });
+    try {
+      final data = await rootBundle.loadString('assets/lab_tests.json');
+      final decoded = json.decode(data) as List<dynamic>;
+      setState(() {
+        tests = decoded;
+      });
+    } catch (e) {
+      // show a short message and keep previous state
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load tests.json')),
+        );
+      }
+    }
   }
 
   int get totalItems => cart.values.fold(0, (a, b) => a + b);
@@ -78,6 +88,13 @@ class _LabProfileScreenState extends State<LabProfileScreen> {
           _bottomBar(),
         ],
       ),
+
+      // Floating button to reload JSON (useful after you edit the JSON file)
+      floatingActionButton: FloatingActionButton(
+        onPressed: loadTests,
+        child: const Icon(Icons.refresh),
+      ),
+
     );
   }
 

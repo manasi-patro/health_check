@@ -140,13 +140,30 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                   _field("Full Name", nameCtrl),
                   _field("Email", emailCtrl),
                   _field("Phone", phoneCtrl),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: changePasswordDialog,
-                    icon: const Icon(Icons.lock_reset),
-                    label: const Text("Change Password"),
-                  ),
+                  const SizedBox(height: 12),
+                  // removed inline Change Password button from here for cleaner profile card
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // NEW: Separate small card for Change Password (better visual placement)
+            _card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                leading: const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Color(0xFF13EC5B),
+                  child: Icon(Icons.lock_reset, color: Colors.black, size: 18),
+                ),
+                title: const Text(
+                  "Change Password",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("Tap to update your account password"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: changePasswordDialog,
               ),
             ),
 
@@ -157,14 +174,40 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionTitle("Health Profile"),
+                  // Privacy / assurance card
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF13EC5B).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: const Color(0xFF13EC5B).withOpacity(0.15)),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.verified_user, color: Colors.green),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "Data Privacy Guaranteed — your medical data is encrypted and shared only with certified pathologists.",
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Personal Metrics
+                  _sectionTitle("Personal Metrics"),
                   DropdownButtonFormField<String>(
-                    initialValue: gender,
+                    value: gender,
                     hint: const Text("Select Gender"),
                     items: const [
                       DropdownMenuItem(value: "male", child: Text("Male")),
                       DropdownMenuItem(value: "female", child: Text("Female")),
                       DropdownMenuItem(value: "other", child: Text("Other")),
+                      DropdownMenuItem(value: "na", child: Text("Prefer not to say")),
                     ],
                     onChanged: (v) => setState(() => gender = v),
                   ),
@@ -176,19 +219,45 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       Expanded(child: _field("Weight (kg)", weightCtrl)),
                     ],
                   ),
+
                   const SizedBox(height: 12),
+                  const Divider(thickness: 1),
+                  const SizedBox(height: 12),
+
+                  // Identity & Privacy
+                  _sectionTitle("Identity & Privacy"),
                   _field(
                     "Aadhar Number",
                     aadharCtrl,
                     obscure: !showAadhar,
                     suffix: IconButton(
-                      icon: Icon(
-                        showAadhar ? Icons.visibility_off : Icons.visibility,
-                      ),
+                      icon: Icon(showAadhar ? Icons.visibility_off : Icons.visibility),
                       onPressed: () => setState(() => showAadhar = !showAadhar),
                     ),
                   ),
-                  _field("Medical History", historyCtrl, max: 3),
+                  Row(
+                    children: const [
+                      Icon(Icons.lock, size: 14),
+                      SizedBox(width: 6),
+                      Text("Securely Encrypted", style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  const Divider(thickness: 1),
+                  const SizedBox(height: 12),
+
+                  // Medical History
+                  _sectionTitle("Medical History"),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _field(
+                      "Past Conditions (Optional)",
+                      historyCtrl,
+                      max: 4,
+                      hint: "Chronic asthma, Gluten allergy...",
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -252,6 +321,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     int max = 1,
     bool obscure = false,
     Widget? suffix,
+    String? hint,
   }) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: TextField(
@@ -260,6 +330,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       obscureText: obscure,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hint,
         filled: true,
         fillColor: const Color(0xFFF6F8F6),
         suffixIcon: suffix,
