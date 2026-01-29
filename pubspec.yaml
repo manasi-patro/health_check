@@ -61,12 +61,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  assets:
-    - assets/login_config.json
-    - assets/lab_profile.json
-    - assets/tests.json
-    - assets/lab_report.json
-    - lib/assets/data.json
+
+
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
