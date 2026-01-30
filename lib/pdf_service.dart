@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 
 class PdfService {
   static Future<void> generateTestReportPdf() async {
+    final jsonString = await rootBundle.loadString('assets/pdf_service.json');
+    final Map<String, dynamic> data = json.decode(jsonString);
+
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -16,92 +21,68 @@ class PdfService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              /// ---------- TITLE ----------
+              // Title
               pw.Center(
                 child: pw.Text(
-                  "Test Report",
+                  data['title'],
                   style: pw.TextStyle(
                     fontSize: 22,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.black,
                   ),
                 ),
               ),
-              pw.SizedBox(height: 16), // spacing after title
-
-              /// ---------- HEADER ----------
-              pw.Text(
-                "City Diagnostic Center",
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.Text("123 Medical Drive, Health City"),
-              pw.Text("ACCREDITED: NABL / CAP"),
               pw.SizedBox(height: 16),
 
-              /// ---------- PATIENT INFO ----------
-              _infoRow("Patient Name", "Johnathan Doe"),
-              _infoRow("Age / Gender", "32 / Male"),
-              _infoRow("Collection Date", "Oct 24, 2023"),
-              _infoRow("Report ID", "REF-987654321"),
+              // Header
+              pw.Text(data['clinic']['name'], style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+              pw.Text(data['clinic']['address']),
+              pw.Text("ACCREDITED: ${data['clinic']['accreditation']}"),
+              pw.SizedBox(height: 16),
+
+              // Patient Info
+              _infoRow("Patient Name", data['patient']['name']),
+              _infoRow("Age / Gender", "${data['patient']['age']} / ${data['patient']['gender']}"),
+              _infoRow("Collection Date", data['patient']['collection_date']),
+              _infoRow("Report ID", data['patient']['report_id']),
 
               pw.Divider(height: 24),
 
-              /// ---------- TABLE HEADER ----------
-              pw.Text(
-                "Metabolic Panel",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
+              // Tests Table
+              pw.Text("Metabolic Panel", style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
-
               _tableHeader(),
-              _tableRow("Hemoglobin", "14.2 g/dL", "13.5 - 17.5"),
-              _tableRow("Glucose (Fasting)", "110 mg/dL", "70 - 100", status: "HIGH"),
-              _tableRow("Creatinine", "0.9 mg/dL", "0.7 - 1.3"),
-              _tableRow("Vitamin D", "18 ng/mL", "30 - 100", status: "DEFICIENT"),
+              ...data['tests'].map<pw.Widget>((t) => _tableRow(
+                t['name'],
+                t['result'],
+                t['reference'],
+                status: t['status'],
+              )),
 
               pw.SizedBox(height: 20),
 
-              /// ---------- IMPRESSION ----------
-              pw.Text(
-                "Pathologist's Impression",
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
+              // Impression
+              pw.Text("Pathologist's Impression", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 6),
-              pw.Text(
-                "Fasting blood glucose is slightly elevated. "
-                    "Vitamin D deficiency noted. Please consult your physician.",
-              ),
-
+              pw.Text(data['impression']['text']),
               pw.SizedBox(height: 16),
-              pw.Text("Dr. Sarah Jenkins"),
-              pw.Text("MD, Consultant Pathologist"),
+              pw.Text(data['impression']['doctor']),
+              pw.Text(data['impression']['designation']),
             ],
           );
         },
       ),
     );
 
-    /// ---------- SAVE + OPEN ----------
+    // Save PDF
     final dir = await getApplicationDocumentsDirectory();
     final file = File("${dir.path}/test_report.pdf");
     await file.writeAsBytes(await pdf.save());
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
-
+    // Preview / Print
+    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
   }
 
-  /// ---------- HELPERS ----------
-
+  // Helper: Info row
   static pw.Widget _infoRow(String title, String value) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 2),
@@ -115,6 +96,7 @@ class PdfService {
     );
   }
 
+  // Helper: Table header
   static pw.Widget _tableHeader() {
     return pw.Container(
       padding: const pw.EdgeInsets.all(8),
@@ -129,12 +111,8 @@ class PdfService {
     );
   }
 
-  static pw.Widget _tableRow(
-      String name,
-      String result,
-      String reference, {
-        String? status,
-      }) {
+  // Helper: Table row
+  static pw.Widget _tableRow(String name, String result, String reference, {String? status}) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(8),
       decoration: pw.BoxDecoration(border: pw.Border.all()),
@@ -146,22 +124,12 @@ class PdfService {
               children: [
                 pw.Text(name),
                 if (status != null)
-                  pw.Text(
-                    status,
-                    style: pw.TextStyle(
-                      color: PdfColors.red,
-                      fontSize: 10,
-                    ),
-                  ),
+                  pw.Text(status, style: pw.TextStyle(color: PdfColors.red, fontSize: 10)),
               ],
             ),
           ),
-          pw.Expanded(
-            child: pw.Text(result, textAlign: pw.TextAlign.right),
-          ),
-          pw.Expanded(
-            child: pw.Text(reference, textAlign: pw.TextAlign.right),
-          ),
+          pw.Expanded(child: pw.Text(result, textAlign: pw.TextAlign.right)),
+          pw.Expanded(child: pw.Text(reference, textAlign: pw.TextAlign.right)),
         ],
       ),
     );

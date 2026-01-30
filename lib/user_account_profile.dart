@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,23 +13,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Edit Profile',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.green,
-        scaffoldBackgroundColor: Colors.grey[100],
-        fontFamily: 'Inter',
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.green,
-        scaffoldBackgroundColor: const Color(0xFF121c15),
-        fontFamily: 'Inter',
-      ),
-      themeMode: ThemeMode.system,
-      home: const EditProfilePage(),
+      home: EditProfilePage(),
     );
   }
 }
@@ -40,172 +28,144 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final TextEditingController nameController =
-  TextEditingController(text: "Dr. Jonathan Smith");
-  final TextEditingController emailController =
-  TextEditingController(text: "j.smith@pathologylab.com");
-  final TextEditingController phoneController =
-  TextEditingController(text: "+1 (555) 123-4567");
-
+  Map<String, dynamic>? config;
+  final Map<String, TextEditingController> controllers = {};
   File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
+  final picker = ImagePicker();
+  final Color greenColor = const Color(0xFF13EC5B);
 
-  Future<void> _pickImage() async {
-    final XFile? pickedImage =
-    await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() {
-        _profileImage = File(pickedImage.path);
-      });
+  @override
+  void initState() {
+    super.initState();
+    loadJson();
+  }
+
+  Future<void> loadJson() async {
+    final data = await rootBundle.loadString('assets/user_account_profile.json');
+    final decoded = json.decode(data);
+
+    for (var field in decoded['fields']) {
+      controllers[field['key']] = TextEditingController(text: field['value']);
+    }
+
+    setState(() => config = decoded);
+  }
+
+  Future<void> pickImage() async {
+    final img = await picker.pickImage(source: ImageSource.gallery);
+    if (img != null) {
+      setState(() => _profileImage = File(img.path));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    if (config == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
+      backgroundColor: Colors.white, // ✅ White background
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          config!['title'],
+          style: const TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+        // 🔹 Back Arrow on Left Side
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Back action
+          },
+        ),
+
+    ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Top AppBar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: theme.scaffoldBackgroundColor.withOpacity(0.9),
-              child: Row(
-                children: [
-                  const SizedBox(width: 24), // 👈 left empty space
-
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        "Edit Profile",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: _profileImage != null
+                      ? FileImage(_profileImage!)
+                      : NetworkImage(config!['profile']['default_image'])
+                  as ImageProvider,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: pickImage,
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: greenColor,
+                      child: const Icon(Icons.camera_alt, color: Colors.black),
                     ),
                   ),
-
-                  // 👉 RIGHT SIDE ARROW
-                  GestureDetector(
-                    onTap: () {
-                      // Navigation to UserHealthProfile has been disabled.
-                      // If you want a different behavior, replace this with:
-                      // Navigator.pop(context);
-                      // or show a message:
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   const SnackBar(content: Text('Disabled'))
-                      // );
-                    },
-                    child: const Icon(Icons.arrow_forward_ios, size: 24),
-                  ),
-                ],
-              ),
+                )
+              ],
             ),
+            const SizedBox(height: 8),
+            Text(
+              config!['profile']['edit_text'],
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
 
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Column(
+            /// 🔹 Dynamic Fields from JSON
+            ...config!['fields'].map<Widget>((f) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: buildField(f),
+              );
+            }).toList(),
+
+            const SizedBox(height: 24),
+
+            /// 🔹 Change Password (Bigger Box)
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: greenColor, width: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Profile Picture
-                    Column(
+                    Row(
                       children: [
-                        Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 64,
-                              backgroundImage: _profileImage != null
-                                  ? FileImage(_profileImage!) as ImageProvider
-                                  : const NetworkImage(
-                                "https://lh3.googleusercontent.com/aida-public/AB6AXuCRLLLOnmDoUw0_AjuXVJwXVwQ0SrR8fKoAETSJ6It6jzR93Vlo49m2powAQKqNAJr54cPUmqd3pA34C2N5L1ENuoT2yldO_o1cGh-H8kiPGK5l1Rzu75KhNKBJmAf7Raa7t8nJATfLMEMbi400LH_POhi_U8a7eioeRJYN8-yUV0ImHYu0UHoCEgw8b02qG5GhEZ56GH8WYNfwyCgcToD_BaeEdXE1fMdLkx_VO_J8GDLeD2ypJhlk9H7Wr2TGf4UgGdTkU0r7sOHO",
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: _pickImage,
-                                child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: Colors.green,
-                                  child: const Icon(Icons.photo_camera,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            )
-                          ],
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: greenColor.withOpacity(0.2),
+                          child: Icon(Icons.lock_reset, color: greenColor),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          "Edit Photo",
+                        const SizedBox(width: 12),
+                        Text(
+                          config!['buttons']['change_password'],
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold, color: greenColor),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    // Form Fields
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        children: [
-                          _buildTextField("Full Name", nameController),
-                          const SizedBox(height: 12),
-                          _buildTextField("Email Address", emailController,
-                              keyboardType: TextInputType.emailAddress),
-                          const SizedBox(height: 12),
-                          _buildTextField("Phone Number", phoneController,
-                              keyboardType: TextInputType.phone),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Change Password Button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.scaffoldBackgroundColor,
-                          foregroundColor: Colors.green,
-                          side: const BorderSide(color: Colors.green),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: () {
-                          // TODO: Add change password functionality
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Colors.greenAccent,
-                                  child: Icon(Icons.lock_reset, color: Colors.green),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Change Password",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            Icon(Icons.chevron_right, color: Colors.green),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 100), // Spacer for Save Button
+                    Icon(Icons.chevron_right, color: greenColor),
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -215,18 +175,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: greenColor,
               foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(8), // ✅ Small round rectangle
+              ),
             ),
-            onPressed: () {
-              // TODO: Add save changes functionality
-            },
-            child: const Text(
-              "Save Changes",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            onPressed: () {},
+            child: Text(
+              config!['buttons']['save'],
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
         ),
@@ -234,33 +193,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {TextInputType keyboardType = TextInputType.text}) {
+  Widget buildField(Map field) {
+    TextInputType type = TextInputType.text;
+    if (field['keyboard'] == 'email') type = TextInputType.emailAddress;
+    if (field['keyboard'] == 'phone') type = TextInputType.phone;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
+          field['label'].toUpperCase(),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
+          controller: controllers[field['key']],
+          keyboardType: type,
           decoration: InputDecoration(
-            hintText: label,
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.green),
+              borderSide: BorderSide(color: greenColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.green, width: 2),
+              borderSide: BorderSide(color: greenColor, width: 2),
             ),
           ),
         ),

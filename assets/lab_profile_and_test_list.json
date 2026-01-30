@@ -1,0 +1,37 @@
+{
+  "profile": {
+    "name": "City Diagnostics Center",
+    "verified": true,
+    "accreditation": "NABL Accredited",
+    "open_time": "Open until 8:00 PM",
+    "address": "12, Medical Square, Downtown",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBx6_qp9FxhmXVU-8f6kYXBmqo-0CuYaBocABdZvn6RApoMwXLXMk2kFcFAddL0BPZFh8KnaJPYwFDsWRhH0e0wuKI9M1uA9sxajF6Sj4dGse1nkpmbvzaCq1qPsD72hDKXFNp0zPU_Bi6MPD6aeQom2Tui9JDiaeXzxaYTHWwj8rIBJEJCHHfGtd-57hY4_M-ifclTkWlhg1m7iAzNGQiDYrqyR38xCUO39v0ZP6-SvTKzonlPAkvkOgDf1zyMS6j4IJnqghXel0KS"
+  },
+  "stats": [
+    { "title": "Rating", "value": "4.8", "sub": "1.2k", "icon": "star" },
+    { "title": "Tests", "value": "500+", "sub": null, "icon": "biotech" },
+    { "title": "Reports", "value": "24h", "sub": null, "icon": "schedule" }
+  ],
+  "tests": [
+    {
+      "title": "Complete Blood Count (CBC)",
+      "desc": "Includes 24 parameters. Recommended for routine checkups.",
+      "price": 302
+    },
+    {
+      "title": "Thyroid Profile (T3, T4, TSH)",
+      "desc": "Assessment of thyroid gland function.",
+      "price": 452
+    },
+    {
+      "title": "Lipid Profile",
+      "desc": "Total cholesterol, HDL, LDL, VLDL and Triglycerides.",
+      "price": 602
+    },
+    {
+      "title": "Diabetes Screening",
+      "desc": "HbA1c and Blood Sugar (Fasting).",
+      "price": 552
+    }
+  ]
+}

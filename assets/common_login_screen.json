@@ -1,0 +1,38 @@
+{
+  "app_title": "Pathology Login",
+  "welcome": {
+    "title": "Welcome Back",
+    "subtitle": "Access your diagnostic reports and lab management tools."
+  },
+  "roles": ["User", "Lab", "Admin"],
+  "fields": [
+    {
+      "key": "email",
+      "label": "Email or Phone Number",
+      "hint": "e.g. name@email.com",
+      "icon": "mail"
+    },
+    {
+      "key": "password",
+      "label": "Password",
+      "hint": "••••••••",
+      "icon": "lock",
+      "isPassword": true,
+      "forgotPassword": true
+    }
+  ],
+  "sign_in_button": {
+    "text": "Sign In",
+    "icon": "login"
+  },
+  "footer": {
+    "text": "Don't have an account?",
+    "action_text": "Register Now"
+  },
+  "icons": {
+    "mail": "Icons.mail",
+    "lock": "Icons.lock",
+    "login": "Icons.login",
+    "biotech": "Icons.biotech"
+  }
+}

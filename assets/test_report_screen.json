@@ -1,0 +1,61 @@
+{
+  "lab": {
+    "name": "City Diagnostic Center",
+    "address": "123 Medical Drive, Health City",
+    "accredited": "NABL / CAP",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAYoNytu_hT_pRvulUrwFluvBYfumQePFfN-AQg1EqaBP1G0Il1X_ORMqaMoZJXpC6t6IBMCvdDNgJk7Pshg57juYybS8Mx71tADQqiSkOMt_FtSnnUs1v-eSKt7E_-_N38GNPU8CiDzdwQEPctA2s_MdalhdyaPXPD7oEIoAp_4s90TweMqZuCC9_TK9zWINr5YW8pADEByuzsp0PkxvSV9eJkUw1RiDzBdqao0fObi0hBj0VdekiNAVwuaVFKiAIFJHJPVK1dXmwa"
+  },
+  "patient": {
+    "name": "Johnathan Doe",
+    "age": 32,
+    "gender": "Male",
+    "collection_date": "Oct 24, 2023",
+    "report_id": "REF-987654321"
+  },
+  "sections": [
+    {
+      "title": "Metabolic Panel",
+      "status": "VERIFIED",
+      "tests": [
+        {
+          "name": "Hemoglobin",
+          "method": "SLS-Hemoglobin",
+          "result": "14.2 g/dL",
+          "reference": "13.5 - 17.5",
+          "type": "normal"
+        },
+        {
+          "name": "Glucose (Fasting)",
+          "method": "HIGH",
+          "result": "110 mg/dL",
+          "reference": "70 - 100",
+          "type": "abnormal",
+          "icon": "error"
+        },
+        {
+          "name": "Creatinine",
+          "method": "Serum, Jaffe",
+          "result": "0.9 mg/dL",
+          "reference": "0.7 - 1.3",
+          "type": "normal"
+        },
+        {
+          "name": "Vitamin D",
+          "method": "DEFICIENT",
+          "result": "18 ng/mL",
+          "reference": "30 - 100",
+          "type": "abnormal",
+          "icon": "warning"
+        }
+      ]
+    }
+  ],
+  "doctor_note": {
+    "title": "Pathologist's Impression",
+    "note": "Fasting blood glucose is slightly elevated. Vitamin D deficiency noted. Clinical correlation with dietary habits and sun exposure is advised. Please consult your physician for further management.",
+    "doctor_name": "Dr. Sarah Jenkins",
+    "doctor_degree": "MD, Consultant Pathologist",
+    "signature": "https://lh3.googleusercontent.com/aida-public/AB6AXuAuv65Nhd_gWAKMj-qda3bPc-YIuor2VQJZjLDCFFnJSR0BeZqjFcHXKKRT8QKLryGf7kx2cEhNGYewS9ANB9ZOFqBGLuDVaycRoUX_hEm02lDkoJaxkuW6SxHHkeCPlN3JrpRDnkxA6q-kcZRGIM4azrAF3dauAK1UlesFp2fn-w7pOMPh7QzmsQh2xXFJ7jM9ksGJWyIxN-qkrUSFiFED5VVtAE0oQ_1c89GmIrE8W5Rchbbuok9Ryf6NeuPX5airlfwJTq7mMbWu"
+  },
+  "disclaimer": "This report is for diagnostic purposes only. All results should be interpreted by a qualified medical professional."
+}

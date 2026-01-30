@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const UserHealthApp());
@@ -15,20 +17,25 @@ class UserHealthApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Inter',
         scaffoldBackgroundColor: const Color(0xFFF6F8F6),
+
+        /// 🔹 GLOBAL INPUT STYLE (important)
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.white,
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFCFE7D7)),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFCFE7D7)),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF13EC5B), width: 2),
+            borderRadius: BorderRadius.circular(8),
+            borderSide:
+            const BorderSide(color: Color(0xFF13EC5B), width: 1.5),
           ),
         ),
       ),
@@ -45,287 +52,268 @@ class UserHealthProfile extends StatefulWidget {
 }
 
 class _UserHealthProfileState extends State<UserHealthProfile> {
-  String? gender;
+  Map<String, dynamic>? config;
+  final Map<String, TextEditingController> controllers = {};
   bool showAadhar = false;
+  String? gender;
 
-  final heightCtrl = TextEditingController();
-  final weightCtrl = TextEditingController();
-  final aadharCtrl = TextEditingController(text: "123456789012");
-  final historyCtrl = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    loadJson();
+  }
+
+  Future<void> loadJson() async {
+    final data =
+    await rootBundle.loadString('assets/user_health_profile.json');
+    setState(() {
+      config = json.decode(data);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (config == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                /// APP BAR
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.95),
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade200),
+        child: Column(
+          children: [
+            /// APP BAR
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  const Icon(Icons.arrow_back_ios_new),
+                  Expanded(
+                    child: Text(
+                      config!['appBar']['title'],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.arrow_back_ios_new),
-                      Expanded(
-                        child: Text(
-                          "User Health Profile",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 24),
-                    ],
-                  ),
-                ),
-
-                /// BODY
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// PRIVACY CARD
-                        Container(
-                          margin: const EdgeInsets.all(16),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF13EC5B).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF13EC5B).withOpacity(0.2),
-                            ),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.verified_user, color: Colors.green),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Data Privacy Guaranteed",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      "Your medical data is encrypted using AES-256 standards and shared only with certified pathologists.",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        _title("Personal Metrics"),
-
-                        _dropdown(
-                          label: "Gender",
-                          value: gender,
-                          items: const [
-                            DropdownMenuItem(
-                              value: "male",
-                              child: Text("Male"),
-                            ),
-                            DropdownMenuItem(
-                              value: "female",
-                              child: Text("Female"),
-                            ),
-                            DropdownMenuItem(
-                              value: "other",
-                              child: Text("Other"),
-                            ),
-                            DropdownMenuItem(
-                              value: "na",
-                              child: Text("Prefer not to say"),
-                            ),
-                          ],
-                          onChanged: (v) => setState(() => gender = v),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _field(
-                                  label: "Height (cm)",
-                                  ctrl: heightCtrl,
-                                  hint: "175",
-                                  type: TextInputType.number,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _field(
-                                  label: "Weight (kg)",
-                                  ctrl: weightCtrl,
-                                  hint: "70",
-                                  type: TextInputType.number,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        _title("Identity & Privacy"),
-
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("Aadhar Card Number"),
-                              const SizedBox(height: 8),
-                              TextField(
-                                controller: aadharCtrl,
-                                keyboardType: TextInputType.number,
-                                obscureText: !showAadhar,
-                                decoration: InputDecoration(
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      showAadhar
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () => setState(
-                                      () => showAadhar = !showAadhar,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: const [
-                                  Icon(Icons.lock, size: 12),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "Securely Encrypted",
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        _title("Medical History"),
-
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: _field(
-                            label: "Past Conditions (Optional)",
-                            ctrl: historyCtrl,
-                            max: 4,
-                            hint: "Chronic asthma, Gluten allergy...",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                /// BOTTOM BUTTON
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      top: BorderSide(color: Colors.grey.shade200),
-                    ),
-                  ),
-                  child: SizedBox(
-                    height: 56,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF13EC5B),
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: () {
-                        // API / Save logic
-                      },
-                      child: const Text(
-                        "Update Health Info",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                  const SizedBox(width: 24),
+                ],
+              ),
             ),
+
+            /// BODY
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    privacyCard(),
+                    ...buildSections(),
+                  ],
+                ),
+              ),
+            ),
+
+            /// BOTTOM BUTTON
+            bottomButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================= UI =================
+
+  Widget privacyCard() => Container(
+    margin: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFF13EC5B).withOpacity(0.1),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        const Icon(Icons.verified_user_outlined, color: Colors.green),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(config!['privacyCard']['title'],
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Text(config!['privacyCard']['description'],
+                  style: const TextStyle(fontSize: 12)),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  List<Widget> buildSections() {
+    return (config!['sections'] as List).map<Widget>((section) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          sectionTitle(section['title']),
+          ...buildFields(section['fields']),
+        ],
+      );
+    }).toList();
+  }
+
+  List<Widget> buildFields(List fields) {
+    return fields.map<Widget>((f) {
+      switch (f['type']) {
+        case 'dropdown':
+          return dropdownField(f);
+        case 'row':
+          return rowFields(f['fields']);
+        case 'aadhar':
+          return aadharField(f);
+        default:
+          return textField(f);
+      }
+    }).toList();
+  }
+
+  Widget rowFields(List fields) => Padding(
+    padding: const EdgeInsets.all(16),
+    child: Row(
+      children: fields.map<Widget>((f) {
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: textField(f),
+          ),
+        );
+      }).toList(),
+    ),
+  );
+
+  Widget textField(Map f) {
+    controllers.putIfAbsent(f['key'], () => TextEditingController());
+
+    // 👇 sirf medical history ke liye
+    final bool isMedicalHistory = f['key'] == 'medical_history';
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Center( // 👈 center me aayega
+        child: SizedBox(
+          width: isMedicalHistory
+              ? MediaQuery.of(context).size.width * 0.85 // 👈 width kam
+              : double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(f['label']),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controllers[f['key']],
+                maxLines: f['maxLines'] ?? 1,
+                keyboardType:
+                f['keyboard'] == 'number' ? TextInputType.number : null,
+                decoration: InputDecoration(hintText: f['hint']),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _title(String t) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-    child: Text(
-      t,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    ),
-  );
 
-  Widget _field({
-    required String label,
-    required TextEditingController ctrl,
-    String? hint,
-    int max = 1,
-    TextInputType? type,
-  }) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label),
-      const SizedBox(height: 8),
-      TextField(
-        controller: ctrl,
-        keyboardType: type,
-        maxLines: max,
-        decoration: InputDecoration(hintText: hint),
-      ),
-    ],
-  );
-
-  Widget _dropdown({
-    required String label,
-    required String? value,
-    required List<DropdownMenuItem<String>> items,
-    required ValueChanged<String?> onChanged,
-  }) => Padding(
+  Widget dropdownField(Map f) => Padding(
     padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label),
+        Text(f['label']),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          initialValue: value,
-          items: items,
-          onChanged: onChanged,
-          decoration: const InputDecoration(hintText: "Select"),
+          value: gender,
+          decoration: const InputDecoration(),
+          items: (f['items'] as List)
+              .map<DropdownMenuItem<String>>(
+                (i) => DropdownMenuItem(
+              value: i['value'],
+              child: Text(i['label']),
+            ),
+          )
+              .toList(),
+          onChanged: (v) => setState(() => gender = v),
         ),
       ],
+    ),
+  );
+
+  Widget aadharField(Map f) {
+    controllers.putIfAbsent(f['key'], () => TextEditingController());
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(f['label']),
+          const SizedBox(height: 8),
+          TextField(
+            controller: controllers[f['key']],
+            obscureText: !showAadhar,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              suffixIcon: IconButton(
+                icon: Icon(
+                    showAadhar ? Icons.visibility_off : Icons.visibility),
+                onPressed: () =>
+                    setState(() => showAadhar = !showAadhar),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.lock, size: 12),
+              const SizedBox(width: 4),
+              Text(f['secureText'],
+                  style: const TextStyle(fontSize: 10)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget sectionTitle(String t) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+    child: Text(t,
+        style:
+        const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+  );
+
+  Widget bottomButton() => Container(
+    padding: const EdgeInsets.all(16),
+    color: Colors.white,
+    child: SizedBox(
+      height: 56,
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF13EC5B),
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        onPressed: () {},
+        child: Text(
+          config!['button']['text'],
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
     ),
   );
 }

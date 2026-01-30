@@ -1,0 +1,77 @@
+{
+  "appBar": {
+    "title": "User Health Profile"
+  },
+
+  "privacyCard": {
+    "title": "Data Privacy Guaranteed",
+    "description": "Your medical data is encrypted using AES-256 standards and shared only with certified pathologists."
+  },
+
+  "sections": [
+    {
+      "title": "Personal Metrics",
+      "fields": [
+        {
+          "type": "dropdown",
+          "key": "gender",
+          "label": "Gender",
+          "items": [
+            { "value": "male", "label": "Male" },
+            { "value": "female", "label": "Female" },
+            { "value": "other", "label": "Other" },
+            { "value": "na", "label": "Prefer not to say" }
+          ]
+        },
+        {
+          "type": "row",
+          "fields": [
+            {
+              "type": "text",
+              "key": "height",
+              "label": "Height (cm)",
+              "hint": "175",
+              "keyboard": "number"
+            },
+            {
+              "type": "text",
+              "key": "weight",
+              "label": "Weight (kg)",
+              "hint": "70",
+              "keyboard": "number"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "title": "Identity & Privacy",
+      "fields": [
+        {
+          "type": "aadhar",
+          "key": "aadhar",
+          "label": "Aadhar Card Number",
+          "secureText": "Securely Encrypted"
+        }
+      ]
+    },
+
+    {
+      "title": "Medical History",
+      "fields": [
+        {
+          "type": "text",
+          "key": "history",
+          "label": "Past Conditions (Optional)",
+          "hint": "Chronic asthma, Gluten allergy...",
+          "maxLines": 4
+        }
+      ]
+    }
+  ],
+
+  "button": {
+    "text": "Update Health Info"
+  }
+}

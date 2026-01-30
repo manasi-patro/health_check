@@ -1,0 +1,31 @@
+{
+  "title": "Edit Profile",
+  "profile": {
+    "default_image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCRLLLOnmDoUw0_AjuXVJwXVwQ0SrR8fKoAETSJ6It6jzR93Vlo49m2powAQKqNAJr54cPUmqd3pA34C2N5L1ENuoT2yldO_o1cGh-H8kiPGK5l1Rzu75KhNKBJmAf7Raa7t8nJATfLMEMbi400LH_POhi_U8a7eioeRJYN8-yUV0ImHYu0UHoCEgw8b02qG5GhEZ56GH8WYNfwyCgcToD_BaeEdXE1fMdLkx_VO_J8GDLeD2ypJhlk9H7Wr2TGf4UgGdTkU0r7sOHO",
+    "edit_text": "Edit Photo"
+  },
+  "fields": [
+    {
+      "key": "name",
+      "label": "Full Name",
+      "value": "Dr. Jonathan Smith",
+      "keyboard": "text"
+    },
+    {
+      "key": "email",
+      "label": "Email Address",
+      "value": "j.smith@pathologylab.com",
+      "keyboard": "email"
+    },
+    {
+      "key": "phone",
+      "label": "Phone Number",
+      "value": "+1 (555) 123-4567",
+      "keyboard": "phone"
+    }
+  ],
+  "buttons": {
+    "change_password": "Change Password",
+    "save": "Save Changes"
+  }
+}

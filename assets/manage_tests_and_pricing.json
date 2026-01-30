@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "Complete Blood Count (CBC)",
+      "labId": "20491",
+      "yourPrice": 498,
+      "customerPrice": 500,
+      "active": true,
+      "icon": "science"
+    },
+    {
+      "name": "Lipid Profile",
+      "labId": "20498",
+      "yourPrice": 748,
+      "customerPrice": 750,
+      "active": true,
+      "icon": "monitor_heart"
+    },
+    {
+      "name": "HbA1c (Glycated Hb)",
+      "labId": "31052",
+      "yourPrice": 598,
+      "customerPrice": 600,
+      "active": false,
+      "icon": "bloodtype"
+    },
+    {
+      "name": "Liver Function Test (LFT)",
+      "labId": "20492",
+      "yourPrice": 848,
+      "customerPrice": 850,
+      "active": true,
+      "icon": "health_and_safety"
+    }
+  ]
+}

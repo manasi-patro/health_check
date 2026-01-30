@@ -61,6 +61,18 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/user_health_profile.json
+    - assets/user_account_profile.json
+    - assets/common_login_screen.json
+    - assets/lab_business_profile.json
+    - assets/manage_tests_and_pricing.json
+    - assets/lab_profile_and_test_list.json
+    - assets/lab_report_management_view.json
+    - assets/test_report_screen.json
+    - assets/pdf_service.json
+
+
 
 
 
