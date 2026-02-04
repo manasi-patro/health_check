@@ -6,8 +6,12 @@ import 'package:dotted_border/dotted_border.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final String jsonString = await rootBundle.loadString('assets/lab_report_management_view.json');
-  final Map<String, dynamic> labData = json.decode(jsonString);
+  // Load the combined JSON file
+  final String jsonString = await rootBundle.loadString('assets/all.json');
+  final Map<String, dynamic> allData = json.decode(jsonString);
+
+  // Extract the lab report management view data
+  final labData = allData['lab_report_management_view'];
 
   runApp(LabReportApp(labData: labData));
 }
@@ -35,6 +39,10 @@ class LabReportApp extends StatelessWidget {
     );
   }
 }
+
+// -------------------- Rest of your LabReportPage & widgets --------------------
+// You can keep the exact same implementation as before
+// Nothing else changes; it will use `labData` extracted from `all.json`
 
 class LabReportPage extends StatefulWidget {
   final Map<String, dynamic> labData;
