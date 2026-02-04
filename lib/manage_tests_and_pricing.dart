@@ -91,11 +91,12 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
   }
 
   Future<void> loadTests() async {
-    final jsonStr = await rootBundle.loadString('assets/manage_tests_and_pricing.json');
+
+    final jsonStr = await rootBundle.loadString('assets/all.json');
     final data = json.decode(jsonStr);
 
     setState(() {
-      tests = (data['tests'] as List)
+      tests = (data['manage_tests_and_pricing']['tests'] as List)
           .map((e) => LabTest.fromJson(e))
           .toList();
     });
@@ -103,8 +104,7 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
 
   List<LabTest> get filteredTests {
     return tests.where((t) {
-      final matchesSearch =
-      t.name.toLowerCase().contains(search.toLowerCase());
+      final matchesSearch = t.name.toLowerCase().contains(search.toLowerCase());
       final matchesTab = selectedTab == 0 ||
           (selectedTab == 1 && t.active) ||
           (selectedTab == 2 && !t.active);
@@ -235,8 +235,7 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
                       color: const Color(0xFF13EC5B).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child:
-                    Icon(test.icon, color: const Color(0xFF13EC5B)),
+                    child: Icon(test.icon, color: const Color(0xFF13EC5B)),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -244,12 +243,10 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(test.name,
-                            style:
-                            const TextStyle(fontWeight: FontWeight.bold)),
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
                         Text(
                           "Lab ID: ${test.labId}",
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -295,23 +292,17 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
           children: [
             Text(
               title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
             ),
             Row(
               children: [
                 Text(
                   "₹$price",
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 if (editable)
                   IconButton(
-                    icon: const Icon(Icons.edit,
-                        size: 18, color: Color(0xFF13EC5B)),
+                    icon: const Icon(Icons.edit, size: 18, color: Color(0xFF13EC5B)),
                     onPressed: onEdit,
                   )
               ],
@@ -343,14 +334,10 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
       items: const [
-        BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard), label: "Dashboard"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services), label: "Tests"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long), label: "Orders"),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.settings), label: "Settings"),
+        BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Dashboard"),
+        BottomNavigationBarItem(icon: Icon(Icons.medical_services), label: "Tests"),
+        BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: "Orders"),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
       ],
     );
   }
@@ -367,9 +354,7 @@ class _ManageTestsScreenState extends State<ManageTestsScreen> {
           keyboardType: TextInputType.number,
         ),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel")),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(
             onPressed: () {
               setState(() {
